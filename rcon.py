@@ -40,6 +40,11 @@ class MCRcon(object):
 
     #重写init方法
     def __init__(self, host, password, port, tlsmode=0):
+        print("in fun rcon,",type(port))
+        try:
+            assert type(port)=='int'
+        except Exception:
+            print(type(port))
         self.host = host
         self.password = password
         self.port = port

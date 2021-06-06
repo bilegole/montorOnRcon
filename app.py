@@ -1,7 +1,9 @@
 from flask import Flask
 from rcon import MCRcon
+import argparse
 
 from threading import Thread
+import traceback
 import time
 import threading
 import json
@@ -16,20 +18,25 @@ class status:
 
 resp = status()
 
-def clock_thread():
+def clock_thread(host,port,password):
     global resp
+    print(type(port))
+    port = int("25575")
+    print(type(port))
     print("clock thread start")
     while True:
         print("clock exec")
         lock.acquire()
         print("locked")
+        print("inloop:",type(port))
         try:
-            with MCRcon("localhost", "111111q.", 25575) as mcr:
+            with MCRcon(host,password,port) as mcr:
                 print("connection open")
                 res = mcr.command("/list")
                 print("online")
                 resp.online = True
         except Exception:
+            print(traceback.print_exc())
             resp.online = False
             print("offline")
         lock.release()
@@ -50,9 +57,21 @@ def hello_world():
 
 
 if __name__== '__main__':
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    with open("config.json","r") as f:
+        config = f.read()
+    cfile = json.loads(config)
+    host = cfile["host"]
+    port = cfile["port"]
+    if type(port)!=type(1):
+        port = int(port)
+    password = cfile["password"]
+    print(f"host:{host},port:{port},password:{password}")
+
     web = Thread(target=lambda:app.run(host="0.0.0.0",port="3000"))
     #app.run(host="0.0.0.0",port="3000")
-    clock=Thread(target=clock_thread)
+    clock=Thread(target=lambda:clock_thread(host=host,port=port,password=password))
     web.start()
     clock.start()
 
