@@ -1,0 +1,15 @@
+[Unit]
+Description=a monitor on Minecraft base on RCON
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/etc/flask-monitor
+ExecStart=bash /usr/local/etc/flask-monitor/start.sh
+ExecReload=/bin/kill -HUP $MAINPID
+RestartSec=5s
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
