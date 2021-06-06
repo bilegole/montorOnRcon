@@ -1,6 +1,7 @@
 from flask import Flask
 from rcon import MCRcon
 import argparse
+import re
 
 from threading import Thread
 import traceback
@@ -35,6 +36,9 @@ def clock_thread(host,port,password):
                 res = mcr.command("/list")
                 print("online")
                 resp.online = True
+                numbers = re.findall("\d+",res)
+                resp.player_num = numbers[0]
+                print(f"player_num:{numbers[0]}")
         except Exception:
             print(traceback.print_exc())
             resp.online = False
